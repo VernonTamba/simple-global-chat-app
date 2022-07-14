@@ -1,0 +1,85 @@
+.mainPage {
+  width: 60vw;
+  height: 80vh;
+  background-color: #fff;
+  border-radius: 1.3em;
+  padding: 1em;
+  box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
+    rgba(60, 64, 67, 0.15) 0px 2px 6px 2px;
+  /* display flex column */
+  display: flex;
+  flex-direction: column;
+}
+
+.mainPage__header {
+  border-bottom: 1px solid gray;
+  display: flex;
+  align-items: center;
+  padding-bottom: 1em;
+}
+
+.mainPage__username {
+  font-size: 1.3rem;
+}
+
+.mainPage__status {
+  font-size: 0.7rem;
+  color: grey;
+}
+
+.mainPage__headerOptions {
+  margin-left: auto;
+  margin-right: 1em;
+  display: flex;
+  gap: 1em;
+}
+
+.MuiAvatar-root {
+  margin-right: 0.5em;
+}
+
+.MuiSvgIcon-root {
+}
+
+.mainPage__chatSpace {
+  background-color: darkgray;
+  overflow: scroll;
+  flex: 1;
+}
+
+.mainPage__chat {
+  font-size: 0.9rem;
+  background-color: aquamarine;
+  width: fit-content;
+  /* border: 2px solid white; */
+  border-radius: 0.5rem;
+  padding: 0.3em;
+  margin: 0.5em;
+}
+
+.mainPage__footer {
+  border-top: 1px solid gray;
+  padding-top: 1em;
+  display: flex;
+  align-items: center;
+}
+
+.mainPage__formInput {
+  flex: 1;
+  display: flex;
+}
+
+.mainPage__formInput > input {
+  width: max-content;
+  border: none;
+  outline: none;
+  font-family: "Poppins", sans-serif;
+  margin-left: 2em;
+  margin-right: 2em;
+  flex: 1;
+}
+
+.mainPage__formInput > button {
+  border: none;
+  background-color: transparent;
+}
