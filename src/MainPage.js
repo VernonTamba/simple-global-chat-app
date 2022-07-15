@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./MainPage.css";
 import Avatar from "@mui/material/Avatar";
 import IconButton from "@mui/material/IconButton";
@@ -10,16 +10,38 @@ import AddIcon from "@mui/icons-material/Add";
 import SendIcon from "@mui/icons-material/Send";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
+import db from "./firebase";
+import firebase from "firebase/compat/app";
 
 const MainPage = () => {
   const [input, setInput] = useState("");
+  const [chats, setChats] = useState([]);
+
+  // Temporary user
+  const [user, setUser] = useState("Administrator");
 
   const sendMessage = (event) => {
     event.preventDefault();
-    console.log(input);
+    db.collection("chatroom").add({
+      username: "Administrator",
+      chat: input,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    });
 
     setInput("");
   };
+
+  useEffect(() => {
+    db.collection("chatroom").onSnapshot((snapshot) =>
+      setChats(
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          data: doc.data(),
+        }))
+      )
+    );
+    console.log(chats);
+  }, []);
 
   return (
     <div className="mainPage">
@@ -27,7 +49,7 @@ const MainPage = () => {
       <div className="mainPage__header">
         <Avatar />
         <div className="mainPage__headerInfo">
-          <h1 className="mainPage__username">John Doe</h1>
+          <h1 className="mainPage__username">Administrator</h1>
           <p className="mainPage__status">Online</p>
         </div>
         <div className="mainPage__headerOptions">
@@ -44,45 +66,16 @@ const MainPage = () => {
       </div>
       {/* CHAT ROOM / SPACE */}
       <div className="mainPage__chatSpace">
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">
-          Hello world! This is my reply to you my friend!
-        </p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
-        <p className="mainPage__chat">Hello world!</p>
+        {chats.map((chat) => (
+          <p
+            key={chat.id}
+            className={`${
+              user === chat.data.username && "mainPage__chatReceiver"
+            } mainPage__chat`}
+          >
+            {chat.data.chat}
+          </p>
+        ))}
       </div>
       {/* FOOTER: Input message, send button, Icons */}
       <div className="mainPage__footer">
