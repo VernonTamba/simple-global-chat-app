@@ -1,0 +1,36 @@
+.landingPage {
+  background-color: lightskyblue;
+}
+
+.landingPage,
+.landingPage__header,
+.landingPage__signUp {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.landingPage__header {
+  margin-bottom: 1em;
+}
+
+.landingPage__signUp {
+  width: 80%;
+  background-color: gray;
+  border-radius: 1rem;
+}
+
+.landingPage__link {
+  text-decoration: none;
+}
+
+.MuiButton-root {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  background: #000;
+}
+
+.MuiSvgIcon-root {
+  margin-bottom: 0.5em;
+}
