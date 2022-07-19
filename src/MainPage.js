@@ -5,7 +5,6 @@ import IconButton from "@mui/material/IconButton";
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import LogoutIcon from "@mui/icons-material/Logout";
-import HomeIcon from "@mui/icons-material/Home";
 import AddIcon from "@mui/icons-material/Add";
 import SendIcon from "@mui/icons-material/Send";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
@@ -13,13 +12,17 @@ import AttachFileIcon from "@mui/icons-material/AttachFile";
 import db from "./firebase";
 import firebase from "firebase/compat/app";
 import { Link } from "react-router-dom";
+import Authentication from "./Authentication";
+import { useAuthContext } from "./ContextAPIAuth";
 
 const MainPage = () => {
   const [input, setInput] = useState("");
   const [chats, setChats] = useState([]);
 
+  const { user, setUser } = useAuthContext();
+
   // Temporary user
-  const [user, setUser] = useState("Administrator");
+  // const [user, setUser] = useState("Administrator");
 
   const sendMessage = (event) => {
     event.preventDefault();
@@ -44,8 +47,9 @@ const MainPage = () => {
     console.log(chats);
   }, []);
 
-  return (
+  return user ? (
     <div className="mainPage">
+      {/* LOGIN / SIGN UP */}
       {/* HEADER PROFILE: Avatar, Username, Icons */}
       <div className="mainPage__header">
         <Avatar />
@@ -54,12 +58,11 @@ const MainPage = () => {
           <p className="mainPage__status">Online</p>
         </div>
         <div className="mainPage__headerOptions">
-          {/* <IconButton>
-            <HomeIcon />
-          </IconButton> */}
-          <IconButton>
-            <DarkModeIcon />
-          </IconButton>
+          <Link to="/">
+            <IconButton>
+              <DarkModeIcon />
+            </IconButton>
+          </Link>
           <Link to="/">
             <IconButton>
               <LogoutIcon />
@@ -108,6 +111,8 @@ const MainPage = () => {
         </form>
       </div>
     </div>
+  ) : (
+    <Authentication />
   );
 };
 

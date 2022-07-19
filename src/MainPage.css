@@ -1,7 +1,7 @@
 .mainPage {
   width: 60vw;
   height: 80vh;
-  background-color: #fff;
+  background-color: #e0e0e0;
   border-radius: 1.3em;
   padding: 1em;
   box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px,
@@ -11,7 +11,6 @@
 }
 
 .mainPage__header {
-  border-bottom: 1px solid gray;
   display: flex;
   align-items: center;
   padding-bottom: 1em;
@@ -30,6 +29,7 @@
   margin-left: auto;
   margin-right: 1em;
   display: flex;
+  align-items: center;
   gap: 1em;
 }
 
@@ -37,13 +37,17 @@
   margin-right: 0.5em;
 }
 
-.MuiSvgIcon-root {
-}
-
 .mainPage__chatSpace {
   background-color: darkgray;
   overflow: scroll;
   flex: 1;
+  box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px,
+    rgb(209, 213, 219) 0px 0px 0px 1px inset;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.mainPage__chatSpace::-webkit-scrollbar {
+  display: none;
 }
 
 .mainPage__chat {
@@ -62,7 +66,6 @@
 }
 
 .mainPage__footer {
-  border-top: 1px solid gray;
   padding-top: 1em;
   display: flex;
   align-items: center;
@@ -71,6 +74,7 @@
 .mainPage__formInput {
   flex: 1;
   display: flex;
+  align-items: center;
 }
 
 .mainPage__formInput > input {
