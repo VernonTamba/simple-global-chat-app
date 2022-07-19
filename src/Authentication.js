@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import "./Authentication.css";
 import { useAuthContext } from "./ContextAPIAuth";
 import { auth } from "./firebase";
@@ -45,25 +45,60 @@ const Authentication = () => {
     signUp,
   } = useAuthContext();
 
+  const clearInputFields = () => {
+    setUsername("");
+    setEmail("");
+    setPassword("");
+  };
+
   const authLogin = () => {
     const authInfo = getAuth();
-    console.log(authInfo);
-    // auth
-    //   .signInWithEmailAndPassword(email, password)
-    //   .then((userCredential) => {
-    //     console.log(userCredential);
-    //   })
-    //   .catch((error) => alert(error.message));
+    auth
+      .signInWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        console.log(userCredential);
+        console.log(userCredential.user.displayName);
+      })
+      .catch((error) => alert(error.message));
   };
 
   const authSignUp = () => {
     const authInfo = getAuth();
-    console.log(authInfo);
-    // auth
-    //   .createUserWithEmailAndPassword(email, password)
-    //   .then((userCredential) => console.log(userCredential))
-    //   .catch((error) => alert(error.message));
+    auth
+      .createUserWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        // userCredential.user.updateProfile({
+        //   displayName: username,
+        // });
+        console.log(userCredential);
+      })
+      .catch((error) => alert(error.message));
   };
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((authUser) => {
+      // User is already signed/logged in
+      if (authUser) {
+        console.log("AUTH OnAuthStateChanged:", authUser);
+        setUser(authUser);
+
+        if (authUser.displayName) {
+          console.log(user);
+          // If there is a display name already, do not update the username
+        } else {
+          return authUser.updateProfile({
+            displayName: username,
+          });
+        }
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [user, username]);
 
   return (
     <div className="authentication">
@@ -100,7 +135,11 @@ const Authentication = () => {
             Login
           </Button>
           <Link className="authentication__link" to="/">
-            <Button style={buttonStyle_2} variant="outlined">
+            <Button
+              onClick={clearInputFields}
+              style={buttonStyle_2}
+              variant="outlined"
+            >
               Back
             </Button>
           </Link>
@@ -131,7 +170,11 @@ const Authentication = () => {
             Sign Up
           </Button>
           <Link className="authentication__link" to="/">
-            <Button style={buttonStyle_2} variant="outlined">
+            <Button
+              onClick={clearInputFields}
+              style={buttonStyle_2}
+              variant="outlined"
+            >
               Back
             </Button>
           </Link>

@@ -14,26 +14,37 @@ import firebase from "firebase/compat/app";
 import { Link } from "react-router-dom";
 import Authentication from "./Authentication";
 import { useAuthContext } from "./ContextAPIAuth";
+import { auth } from "./firebase";
 
 const MainPage = () => {
   const [input, setInput] = useState("");
   const [chats, setChats] = useState([]);
+  const [seed, setSeed] = useState("");
 
-  const { user, setUser } = useAuthContext();
-
-  // Temporary user
-  // const [user, setUser] = useState("Administrator");
+  const { username, user, setUser, setUsername, setEmail, setPassword } =
+    useAuthContext();
 
   const sendMessage = (event) => {
     event.preventDefault();
     db.collection("chatroom").add({
-      username: "Administrator",
+      username: user.displayName,
       chat: input,
       timestamp: firebase.firestore.FieldValue.serverTimestamp(),
     });
 
     setInput("");
   };
+
+  const authSignOut = () => {
+    auth.signOut().catch((error) => alert(error.message));
+    setUsername("");
+    setEmail("");
+    setPassword("");
+  };
+
+  useEffect(() => {
+    setSeed(Math.floor(Math.random() * 5000));
+  }, []);
 
   useEffect(() => {
     db.collection("chatroom").onSnapshot((snapshot) =>
@@ -44,17 +55,46 @@ const MainPage = () => {
         }))
       )
     );
-    console.log(chats);
+    // console.log(chats);
   }, []);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((authUser) => {
+      // User is already signed/logged in
+      if (authUser) {
+        console.log("MAIN PAGE OnAuthStateChanged:", authUser);
+        setUser(authUser);
+
+        if (authUser.displayName) {
+          console.log(user);
+          // If there is a display name already, do not update the username
+        } else {
+          return authUser.updateProfile({
+            displayName: username,
+          });
+        }
+      } else {
+        console.log("Signed out");
+        setUser(null);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [user, username]);
 
   return user ? (
     <div className="mainPage">
       {/* LOGIN / SIGN UP */}
       {/* HEADER PROFILE: Avatar, Username, Icons */}
       <div className="mainPage__header">
-        <Avatar />
+        <Avatar
+          alt="Avatar Dicebar"
+          src={`https://avatars.dicebear.com/api/human/${seed}.svg`}
+        />
         <div className="mainPage__headerInfo">
-          <h1 className="mainPage__username">Administrator</h1>
+          <h1 className="mainPage__username">{user?.displayName}</h1>
           <p className="mainPage__status">Online</p>
         </div>
         <div className="mainPage__headerOptions">
@@ -65,7 +105,7 @@ const MainPage = () => {
           </Link>
           <Link to="/">
             <IconButton>
-              <LogoutIcon />
+              <LogoutIcon onClick={authSignOut} />
             </IconButton>
           </Link>
         </div>
@@ -76,7 +116,8 @@ const MainPage = () => {
           <p
             key={chat.id}
             className={`${
-              user === chat.data.username && "mainPage__chatReceiver"
+              user.displayName === chat.data.username &&
+              "mainPage__chatReceiver"
             } mainPage__chat`}
           >
             {chat.data.chat}

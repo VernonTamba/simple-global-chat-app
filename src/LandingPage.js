@@ -6,6 +6,7 @@ import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
 import { makeStyles } from "@mui/material";
 import { useAuthContext } from "./ContextAPIAuth";
+import { auth } from "./firebase";
 
 const LandingPage = () => {
   const buttonStyle = {
@@ -15,40 +16,78 @@ const LandingPage = () => {
     marginBlock: "1em",
   };
 
-  const { setLogin, setSignUp } = useAuthContext();
+  const { user, username, setUser, setLogin, setSignUp } = useAuthContext();
 
   useEffect(() => {
     setLogin(false);
     setSignUp(false);
   }, []);
 
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((authUser) => {
+      // User is already signed/logged in
+      if (authUser) {
+        console.log("LANDING PAGE OnAuthStateChanged:", authUser);
+        setUser(authUser);
+
+        if (authUser.displayName) {
+          // If there is a display name already, do not update the username
+        } else {
+          return authUser.updateProfile({
+            displayName: username,
+          });
+        }
+      } else {
+        setUser(null);
+      }
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, [user, username]);
+
   return (
     <div className="landingPage">
       <div className="landingPage__header">
         <h1>Simple Global Chat App</h1>
         <PublicIcon style={{ fontSize: "3em" }} />
-        <Link className="landingPage__link" to="/global">
-          <Button
-            onClick={() => setLogin(true)}
-            style={buttonStyle}
-            variant="contained"
-          >
-            Login
-          </Button>
-        </Link>
+        {!user && (
+          <Link className="landingPage__link" to="/global">
+            <Button
+              onClick={() => setLogin(true)}
+              style={buttonStyle}
+              variant="contained"
+            >
+              Login
+            </Button>
+          </Link>
+        )}
       </div>
 
       <div className="landingPage__signUp">
-        <p>No account yet?</p>
-        <Link className="landingPage__link" to="/global">
-          <Button
-            onClick={() => setSignUp(true)}
-            style={buttonStyle}
-            variant="contained"
-          >
-            Sign Up
-          </Button>
-        </Link>
+        {user ? (
+          <p>{`Currently logged in: ${user?.displayName}`}</p>
+        ) : (
+          <p>No account yet?</p>
+        )}
+        {user ? (
+          <Link className="landingPage__link" to="/global">
+            <Button style={buttonStyle} variant="contained">
+              Continue
+            </Button>
+          </Link>
+        ) : (
+          <Link className="landingPage__link" to="/global">
+            <Button
+              onClick={() => setSignUp(true)}
+              style={buttonStyle}
+              variant="contained"
+            >
+              Sign Up
+            </Button>
+          </Link>
+        )}
       </div>
     </div>
   );
