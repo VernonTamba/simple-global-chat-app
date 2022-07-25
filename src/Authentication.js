@@ -52,7 +52,7 @@ const Authentication = () => {
   };
 
   const authLogin = () => {
-    const authInfo = getAuth();
+    // const authInfo = getAuth();
     auth
       .signInWithEmailAndPassword(email, password)
       .then((userCredential) => {
@@ -63,7 +63,7 @@ const Authentication = () => {
   };
 
   const authSignUp = () => {
-    const authInfo = getAuth();
+    // const authInfo = getAuth();
     auth
       .createUserWithEmailAndPassword(email, password)
       .then((userCredential) => {
@@ -77,20 +77,25 @@ const Authentication = () => {
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
+      console.log("On auth state changed!");
       // User is already signed/logged in
       if (authUser) {
-        console.log("AUTH OnAuthStateChanged:", authUser);
         setUser(authUser);
 
         if (authUser.displayName) {
           console.log(user);
           // If there is a display name already, do not update the username
         } else {
-          return authUser.updateProfile({
+          // return authUser.updateProfile({
+          //   displayName: username,
+          // });
+          authUser.updateProfile({
             displayName: username,
           });
+          setUser(authUser);
         }
       } else {
+        // User is signed out
         setUser(null);
       }
     });

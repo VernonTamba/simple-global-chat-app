@@ -21,8 +21,21 @@ const MainPage = () => {
   const [chats, setChats] = useState([]);
   const [seed, setSeed] = useState("");
 
-  const { username, user, setUser, setUsername, setEmail, setPassword } =
-    useAuthContext();
+  const {
+    username,
+    user,
+    setUser,
+    setUsername,
+    setEmail,
+    setPassword,
+    setLogin,
+    setSignUp,
+  } = useAuthContext();
+
+  const userSignedOut = () => {
+    setLogin(false);
+    setSignUp(false);
+  };
 
   const sendMessage = (event) => {
     event.preventDefault();
@@ -47,34 +60,43 @@ const MainPage = () => {
   }, []);
 
   useEffect(() => {
-    db.collection("chatroom").onSnapshot((snapshot) =>
-      setChats(
-        snapshot.docs.map((doc) => ({
-          id: doc.id,
-          data: doc.data(),
-        }))
-      )
-    );
+    db.collection("chatroom")
+      .orderBy("timestamp", "asc")
+      .onSnapshot((snapshot) =>
+        setChats(
+          snapshot.docs.map((doc) => ({
+            id: doc.id,
+            data: doc.data(),
+          }))
+        )
+      );
     // console.log(chats);
   }, []);
 
+  // TODO: Fix blank username when sign up & Insert more info for the chatbox
+
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
+      console.log("On auth state changed!");
       // User is already signed/logged in
       if (authUser) {
-        console.log("MAIN PAGE OnAuthStateChanged:", authUser);
         setUser(authUser);
 
         if (authUser.displayName) {
           console.log(user);
           // If there is a display name already, do not update the username
         } else {
-          return authUser.updateProfile({
+          // return authUser.updateProfile({
+          //   displayName: username,
+          // });
+          authUser.updateProfile({
             displayName: username,
           });
+          setUser(authUser);
+          console.log(user);
         }
       } else {
-        console.log("Signed out");
+        // User is signed out
         setUser(null);
       }
     });
@@ -98,14 +120,17 @@ const MainPage = () => {
           <p className="mainPage__status">Online</p>
         </div>
         <div className="mainPage__headerOptions">
+          <IconButton>
+            <DarkModeIcon />
+          </IconButton>
           <Link to="/">
             <IconButton>
-              <DarkModeIcon />
-            </IconButton>
-          </Link>
-          <Link to="/">
-            <IconButton>
-              <LogoutIcon onClick={authSignOut} />
+              <LogoutIcon
+                onClick={() => {
+                  authSignOut();
+                  userSignedOut();
+                }}
+              />
             </IconButton>
           </Link>
         </div>

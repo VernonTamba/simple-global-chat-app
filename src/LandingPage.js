@@ -27,7 +27,6 @@ const LandingPage = () => {
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
       // User is already signed/logged in
       if (authUser) {
-        console.log("LANDING PAGE OnAuthStateChanged:", authUser);
         setUser(authUser);
 
         if (authUser.displayName) {
@@ -38,6 +37,7 @@ const LandingPage = () => {
           });
         }
       } else {
+        // User is signed out
         setUser(null);
       }
     });
@@ -45,7 +45,7 @@ const LandingPage = () => {
     return () => {
       unsubscribe();
     };
-  }, [user, username]);
+  }, [user]);
 
   return (
     <div className="landingPage">
