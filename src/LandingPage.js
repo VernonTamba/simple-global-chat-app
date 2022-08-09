@@ -1,10 +1,8 @@
 import React, { useEffect } from "react";
 import "./LandingPage.css";
 import PublicIcon from "@mui/icons-material/Public";
-import ChatIcon from "@mui/icons-material/Chat";
 import Button from "@mui/material/Button";
 import { Link } from "react-router-dom";
-import { makeStyles } from "@mui/material";
 import { useAuthContext } from "./ContextAPIAuth";
 import { auth } from "./firebase";
 
@@ -21,7 +19,7 @@ const LandingPage = () => {
   useEffect(() => {
     setLogin(false);
     setSignUp(false);
-  }, []);
+  }, [setLogin, setSignUp]);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((authUser) => {
@@ -45,7 +43,7 @@ const LandingPage = () => {
     return () => {
       unsubscribe();
     };
-  }, [user]);
+  }, [user, setUser, username]);
 
   return (
     <div className="landingPage">

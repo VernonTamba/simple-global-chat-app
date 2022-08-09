@@ -28,6 +28,7 @@
 .mainPage__headerOptions {
   margin-left: auto;
   margin-right: 1em;
+  margin-block: auto;
   display: flex;
   align-items: center;
   gap: 1em;
@@ -35,6 +36,19 @@
 
 .MuiAvatar-root {
   margin-right: 0.5em;
+}
+
+.mainPage__headerSignOutLink > .MuiSvgIcon-root {
+  display: flex;
+  align-items: center;
+  border-radius: 50%;
+  color: gray;
+  margin: 0;
+}
+
+.mainPage__headerSignOutLink > .MuiSvgIcon-root:hover {
+  color: black;
+  transform: scale(1.2);
 }
 
 .mainPage__chatSpace {
@@ -56,8 +70,29 @@
   width: fit-content;
   /* border: 2px solid white; */
   border-radius: 0.5rem;
-  padding: 0.4em;
-  margin: 0.5em;
+  padding-top: 1em;
+  padding-bottom: 0.4em;
+  padding-inline: 0.8em;
+  margin-block: 1em;
+  margin-inline: 0.5em;
+  position: relative;
+}
+
+.mainPage__chat > .chat__username,
+.mainPage__chat > .chat__timestamp {
+  font-size: 8px;
+  font-weight: 600;
+}
+
+.mainPage__chat > .chat__username {
+  position: absolute;
+  top: 2px;
+}
+
+.mainPage__chat > .chat__timestamp {
+  bottom: 2px;
+  color: gray;
+  margin-left: 1em;
 }
 
 .mainPage__chatReceiver {
@@ -65,10 +100,32 @@
   margin-left: auto;
 }
 
+.mainPage__chatReceiver > .chat__timestamp {
+  color: black;
+}
+
 .mainPage__footer {
   padding-top: 1em;
   display: flex;
   align-items: center;
+}
+
+.mainPage__footerOptions {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  margin-inline: 0.5em;
+}
+
+.mainPage__footer .MuiSvgIcon-root {
+  cursor: pointer;
+  color: grey;
+  margin-inline: 0.2em;
+  margin-block: auto;
+}
+
+.mainPage__footer .MuiSvgIcon-root:hover {
+  color: black;
 }
 
 .mainPage__formInput {
@@ -82,8 +139,8 @@
   border: none;
   outline: none;
   font-family: "Poppins", sans-serif;
-  margin-left: 2em;
-  margin-right: 2em;
+  margin-inline: 0.5em;
+  margin-block: auto;
   flex: 1;
 }
 

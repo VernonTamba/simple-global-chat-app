@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "./MainPage.css";
 import Avatar from "@mui/material/Avatar";
-import IconButton from "@mui/material/IconButton";
-import DarkModeIcon from "@mui/icons-material/DarkMode";
-import LightModeIcon from "@mui/icons-material/LightMode";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AddIcon from "@mui/icons-material/Add";
 import SendIcon from "@mui/icons-material/Send";
@@ -14,7 +11,12 @@ import firebase from "firebase/compat/app";
 import { Link } from "react-router-dom";
 import Authentication from "./Authentication";
 import { useAuthContext } from "./ContextAPIAuth";
-import { auth } from "./firebase";
+import {
+  getAuth,
+  onAuthStateChanged,
+  updateProfile,
+  signOut,
+} from "firebase/auth";
 
 const MainPage = () => {
   const [input, setInput] = useState("");
@@ -49,7 +51,8 @@ const MainPage = () => {
   };
 
   const authSignOut = () => {
-    auth.signOut().catch((error) => alert(error.message));
+    const auth = getAuth();
+    signOut(auth).catch((error) => alert(error.message));
     setUsername("");
     setEmail("");
     setPassword("");
@@ -70,30 +73,22 @@ const MainPage = () => {
           }))
         )
       );
-    // console.log(chats);
   }, []);
 
-  // TODO: Fix blank username when sign up & Insert more info for the chatbox
-
+  // TODO: Fix blank username when sign up & Insert more info for the chatbox!
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((authUser) => {
-      console.log("On auth state changed!");
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, (authUser) => {
       // User is already signed/logged in
       if (authUser) {
         setUser(authUser);
 
         if (authUser.displayName) {
-          console.log(user);
           // If there is a display name already, do not update the username
         } else {
-          // return authUser.updateProfile({
-          //   displayName: username,
-          // });
-          authUser.updateProfile({
+          return updateProfile(auth.currentUser, {
             displayName: username,
           });
-          setUser(authUser);
-          console.log(user);
         }
       } else {
         // User is signed out
@@ -104,7 +99,7 @@ const MainPage = () => {
     return () => {
       unsubscribe();
     };
-  }, [user, username]);
+  }, [user, setUser, username]);
 
   return user ? (
     <div className="mainPage">
@@ -116,25 +111,24 @@ const MainPage = () => {
           src={`https://avatars.dicebear.com/api/human/${seed}.svg`}
         />
         <div className="mainPage__headerInfo">
-          <h1 className="mainPage__username">{user?.displayName}</h1>
+          {/* Fix the firebase onAuthStateChange Bug! */}
+          <h1 className="mainPage__username">
+            {user.displayName === null ? username : user?.displayName}
+          </h1>
           <p className="mainPage__status">Online</p>
         </div>
         <div className="mainPage__headerOptions">
-          <IconButton>
-            <DarkModeIcon />
-          </IconButton>
-          <Link to="/">
-            <IconButton>
-              <LogoutIcon
-                onClick={() => {
-                  authSignOut();
-                  userSignedOut();
-                }}
-              />
-            </IconButton>
+          <Link className="mainPage__headerSignOutLink" to="/">
+            <LogoutIcon
+              onClick={() => {
+                authSignOut();
+                userSignedOut();
+              }}
+            />
           </Link>
         </div>
       </div>
+      {/* TODO: Set the default position of the chat space at the latest message or at the very bottom */}
       {/* CHAT ROOM / SPACE */}
       <div className="mainPage__chatSpace">
         {chats.map((chat) => (
@@ -145,22 +139,24 @@ const MainPage = () => {
               "mainPage__chatReceiver"
             } mainPage__chat`}
           >
+            <span className="chat__username">
+              {user.displayName === chat.data.username
+                ? "You"
+                : `${chat.data.username}`}
+            </span>
             {chat.data.chat}
+            <span className="chat__timestamp">
+              {new Date(chat.data.timestamp?.toDate()).toUTCString()}
+            </span>
           </p>
         ))}
       </div>
       {/* FOOTER: Input message, send button, Icons */}
       <div className="mainPage__footer">
         <div className="mainPage__footerOptions">
-          <IconButton>
-            <AddIcon />
-          </IconButton>
-          <IconButton>
-            <AddPhotoAlternateIcon />
-          </IconButton>
-          <IconButton>
-            <AttachFileIcon />
-          </IconButton>
+          <AddIcon />
+          <AddPhotoAlternateIcon />
+          <AttachFileIcon />
         </div>
         <form className="mainPage__formInput">
           <input
@@ -169,10 +165,8 @@ const MainPage = () => {
             placeholder="Type a message here..."
             onChange={(event) => setInput(event.target.value)}
           />
-          <button type="submit" onClick={sendMessage}>
-            <IconButton>
-              <SendIcon />
-            </IconButton>
+          <button type="submit" onClick={sendMessage} disabled={!input}>
+            <SendIcon />
           </button>
         </form>
       </div>

@@ -1,13 +1,14 @@
-import React, { useEffect } from "react";
+import React from "react";
 import "./Authentication.css";
 import { useAuthContext } from "./ContextAPIAuth";
-import { auth } from "./firebase";
 import Button from "@mui/material/Button";
-import { getAuth } from "firebase/auth";
-import IconButton from "@mui/material/IconButton";
 import HomeIcon from "@mui/icons-material/Home";
 import { Link } from "react-router-dom";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
 
 const Authentication = () => {
   const buttonStyle = {
@@ -34,7 +35,6 @@ const Authentication = () => {
 
   const {
     user,
-    setUser,
     username,
     setUsername,
     email,
@@ -52,58 +52,22 @@ const Authentication = () => {
   };
 
   const authLogin = () => {
-    // const authInfo = getAuth();
-    auth
-      .signInWithEmailAndPassword(email, password)
+    const auth = getAuth();
+    signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log(userCredential);
-        console.log(userCredential.user.displayName);
       })
       .catch((error) => alert(error.message));
   };
 
   const authSignUp = () => {
-    // const authInfo = getAuth();
-    auth
-      .createUserWithEmailAndPassword(email, password)
+    const auth = getAuth();
+    createUserWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
-        // userCredential.user.updateProfile({
-        //   displayName: username,
-        // });
         console.log(userCredential);
       })
       .catch((error) => alert(error.message));
   };
-
-  useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged((authUser) => {
-      console.log("On auth state changed!");
-      // User is already signed/logged in
-      if (authUser) {
-        setUser(authUser);
-
-        if (authUser.displayName) {
-          console.log(user);
-          // If there is a display name already, do not update the username
-        } else {
-          // return authUser.updateProfile({
-          //   displayName: username,
-          // });
-          authUser.updateProfile({
-            displayName: username,
-          });
-          setUser(authUser);
-        }
-      } else {
-        // User is signed out
-        setUser(null);
-      }
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, [user, username]);
 
   return (
     <div className="authentication">
@@ -136,7 +100,7 @@ const Authentication = () => {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
           />
-          <Button style={buttonStyle} onClick={authLogin}>
+          <Button type="submit" style={buttonStyle} onClick={authLogin}>
             Login
           </Button>
           <Link className="authentication__link" to="/">
@@ -171,7 +135,7 @@ const Authentication = () => {
             value={password}
             onChange={(event) => setPassword(event.target.value)}
           />
-          <Button style={buttonStyle} onClick={authSignUp}>
+          <Button type="submit" style={buttonStyle} onClick={authSignUp}>
             Sign Up
           </Button>
           <Link className="authentication__link" to="/">
